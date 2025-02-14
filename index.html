@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern MCQs Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --secondary-color: #f1f3f4;
+            --text-color: #202124;
+            --correct-color: #34a853;
+            --incorrect-color: #ea4335;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f0;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+        }
+
+        .quiz-header {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .quiz-title {
+            font-size: 24px;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background-color: var(--secondary-color);
+            margin-top: 10px;
+        }
+
+        .progress {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-body {
+            padding: 30px;
+        }
+
+        .question {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option {
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: 4px;
+            padding: 15px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            text-align: left;
+        }
+
+        .option:hover {
+            background-color: #e8e8e8;
+        }
+
+        .option.correct {
+            background-color: var(--correct-color);
+            color: #ffffff;
+        }
+
+        .option.incorrect {
+            background-color: var(--incorrect-color);
+            color: #ffffff;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .next-btn {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .next-btn:hover {
+            background-color: #1565c0;
+        }
+
+        .results {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .results h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .results p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .restart-btn {
+            background-color: var(--primary-color);
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            background-color: #1565c0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <h1 class="quiz-title">computer lec 1 by mohammad Riyadh</h1>
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+        <div class="quiz-body">
+            <div id="question-container">
+                <p class="question"></p>
+                <div class="options"></div>
+                <p class="feedback"></p>
+                <button class="next-btn" style="display: none;">الي بعده</button>
+            </div>
+            <div id="results" class="results" style="display: none;">
+                <h2>النتيجة مع تمنياتنا بالنجاح</h2>
+                <p>Your Score: <span id="score"></span></p>
+                <p>الاجوبة الصح:<span id="correct-answers"></span></p>
+                <p>اغلاطك الما تتكرر ان شاء الله:<span id="incorrect-answers"></span></p>
+                <button class="restart-btn">Restart Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+    {
+        "question": "Which of the following best describes a 'network' based on the provided text?",
+        "options": [
+            "A single computer disconnected from the internet",
+            "A collection of interconnected devices that share resources and data",
+            "A standalone printer sharing no data with other devices",
+            "A wireless access point that only operates locally"
+        ],
+        "correctAnswer": 1
+    },
+    {
+        "question": "What is the main purpose of networks in modern digital communication?",
+        "options": [
+            "To isolate devices from each other",
+            "To limit data exchange between organizations",
+            "To enable collaboration, share resources, and facilitate data exchange",
+            "To prevent internet connectivity"
+        ],
+        "correctAnswer": 2
+    },
+    {
+        "question": "Which type of network covers a small geographic area, such as a home or office?",
+        "options": [
+            "Wide Area Network (WAN)",
+            "Local Area Network (LAN)",
+            "Metropolitan Area Network (MAN)",
+            "Virtual Private Network (VPN)"
+        ],
+        "correctAnswer": 1
+    },
+    {
+        "question": "Which network type generally spans across multiple cities or even countries?",
+        "options": [
+            "Local Area Network (LAN)",
+            "Personal Area Network (PAN)",
+            "Metropolitan Area Network (MAN)",
+            "Wide Area Network (WAN)"
+        ],
+        "correctAnswer": 3
+    },
+    {
+        "question": "Which of the following security objectives focuses on protecting data from unauthorized access?",
+        "options": [
+            "Integrity",
+            "Availability",
+            "Confidentiality",
+            "Non-repudiation"
+        ],
+        "correctAnswer": 2
+    },
+    {
+        "question": "Which security objective ensures that data remains accurate and unaltered during transmission or storage?",
+        "options": [
+            "Confidentiality",
+            "Integrity",
+            "Availability",
+            "Authentication"
+        ],
+        "correctAnswer": 1
+    },
+    {
+        "question": "Which principle ensures that users have only the permissions necessary to perform their roles?",
+        "options": [
+            "Principle of least privilege",
+            "Non-repudiation",
+            "Full availability",
+            "Confidentiality"
+        ],
+        "correctAnswer": 0
+    },
+    {
+        "question": "Which of the following helps verify the identity of users or devices before granting access?",
+        "options": [
+            "Authorization",
+            "Encryption",
+            "Authentication",
+            "Virtual Private Network (VPN)"
+        ],
+        "correctAnswer": 2
+    },
+    {
+        "question": "Which concept ensures actions taken in a network cannot be denied later by the parties involved?",
+        "options": [
+            "Non-repudiation",
+            "Least privilege",
+            "Access control",
+            "Authentication"
+        ],
+        "correctAnswer": 0
+    },
+    {
+        "question": "Which term describes continuously monitoring network traffic for anomalies or potential threats?",
+        "options": [
+            "Confidentiality",
+            "Network monitoring and management",
+            "Availability",
+            "Virtual Private Network"
+        ],
+        "correctAnswer": 1
+    },
+    {
+        "question": "Which tool mentioned in the text helps identify and respond to security incidents and breaches promptly?",
+        "options": [
+            "Access control",
+            "Encryption keys",
+            "Intrusion Detection Systems (IDS)",
+            "Modems"
+        ],
+        "correctAnswer": 2
+    },
+    {
+        "question": "Which of the following best describes 'Security Networks' based on the provided text?",
+        "options": [
+            "Networks with no built-in security protocols",
+            "Systems and protocols designed to protect data and resources within a network",
+            "Networks only used for personal devices",
+            "A type of LAN that encrypts data automatically"
+        ],
+        "correctAnswer": 1
+    },
+    {
+        "question": "Which security measure controls incoming and outgoing traffic based on predefined rules?",
+        "options": [
+            "Router",
+            "Switch",
+            "Firewall",
+            "Access Point"
+        ],
+        "correctAnswer": 2
+    },
+    {
+        "question": "Which security technology monitors network traffic for suspicious activities and can respond to threats?",
+        "options": [
+            "Intrusion Detection and Prevention Systems (IDPS)",
+            "Modems",
+            "Network interface cards (NICs)",
+            "Fiber Optic Cables"
+        ],
+        "correctAnswer": 0
+    },
+    {
+        "question": "Which of the following methods secures data transmission across networks to ensure confidentiality and integrity?",
+        "options": [
+            "Switching",
+            "Encryption",
+            "Routing",
+            "Cabling"
+        ],
+        "correctAnswer": 1
+    },
+    {
+        "question": "Which component connects devices in a LAN by forwarding data to specific devices based on MAC addresses?",
+        "options": [
+            "Router",
+            "Switch",
+            "Firewall",
+            "Modem"
+        ],
+        "correctAnswer": 1
+    },
+    {
+        "question": "Which devices modulate and demodulate signals for internet connectivity over telephone lines?",
+        "options": [
+            "Switches",
+            "Modems",
+            "Routers",
+            "Firewalls"
+        ],
+        "correctAnswer": 1
+    },
+    {
+        "question": "Which type of network typically uses Bluetooth connections for very short-range communication?",
+        "options": [
+            "Wide Area Network (WAN)",
+            "Local Area Network (LAN)",
+            "Personal Area Network (PAN)",
+            "Metropolitan Area Network (MAN)"
+        ],
+        "correctAnswer": 2
+    },
+    {
+        "question": "What is a Virtual Private Network (VPN) primarily used for?",
+        "options": [
+            "Speeding up local data transfers",
+            "Providing secure access to a private network over the internet",
+            "Replacing all physical communication devices",
+            "Controlling all traffic within a LAN automatically"
+        ],
+        "correctAnswer": 1
+    },
+    {
+        "question": "Which element of network security involves comprehensive logging and tracking of network actions to provide evidence?",
+        "options": [
+            "Non-repudiation",
+            "Confidentiality",
+            "Redundancy",
+            "Encryption"
+        ],
+        "correctAnswer": 0
+    }
+];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        const questionContainer = document.getElementById('question-container');
+        const questionElement = questionContainer.querySelector('.question');
+        const optionsElement = questionContainer.querySelector('.options');
+        const feedbackElement = questionContainer.querySelector('.feedback');
+        const nextButton = questionContainer.querySelector('.next-btn');
+        const progressBar = document.querySelector('.progress');
+        const resultsContainer = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const correctAnswersElement = document.getElementById('correct-answers');
+        const incorrectAnswersElement = document.getElementById('incorrect-answers');
+        const restartButton = document.querySelector('.restart-btn');
+
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            questionElement.textContent = question.question;
+            optionsElement.innerHTML = '';
+            
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.classList.add('option');
+                button.textContent = option;
+                button.addEventListener('click', () => selectOption(index));
+                optionsElement.appendChild(button);
+            });
+
+            feedbackElement.style.opacity = '0';
+            nextButton.style.display = 'none';
+            
+            // Animate question and options
+            gsap.from(questionElement, {opacity: 0, y: 20, duration: 0.5});
+            gsap.from(optionsElement.children, {opacity: 0, y: 20, duration: 0.5, stagger: 0.1});
+
+            updateProgressBar();
+        }
+
+        function selectOption(index) {
+            const options = optionsElement.querySelectorAll('.option');
+            const question = questions[currentQuestion];
+
+            options.forEach(option => option.disabled = true);
+
+            if (index === question.correctAnswer) {
+                options[index].classList.add('correct');
+                feedbackElement.textContent = 'رهيب';
+                feedbackElement.style.color = 'var(--correct-color)';
+                score++;
+            } else {
+                options[index].classList.add('incorrect');
+                options[question.correctAnswer].classList.add('correct');
+                feedbackElement.textContent = 'وداعتك ' + question.options[question.correctAnswer];
+                feedbackElement.style.color = 'var(--incorrect-color)';
+            }
+
+            feedbackElement.style.opacity = '1';
+            nextButton.style.display = 'block';
+
+            // Animate feedback and next button
+            gsap.from(feedbackElement, {opacity: 0, y: 20, duration: 0.5});
+            gsap.from(nextButton, {opacity: 0, y: 20, duration: 0.5, delay: 0.2});
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = (currentQuestion / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        function showResults() {
+            questionContainer.style.display = 'none';
+            resultsContainer.style.display = 'block';
+            scoreElement.textContent = `${score} / ${questions.length}`;
+            correctAnswersElement.textContent = score;
+            incorrectAnswersElement.textContent = questions.length - score;
+
+            // Animate results
+            gsap.from(resultsContainer.children, {opacity: 0, y: 20, duration: 0.5, stagger: 0.1});
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            questionContainer.style.display = 'block';
+            resultsContainer.style.display = 'none';
+            loadQuestion();
+        }
+
+        nextButton.addEventListener('click', nextQuestion);
+        restartButton.addEventListener('click', restartQuiz);
+
+        loadQuestion();
+    </script>
+</body>
+</html>
